@@ -10,13 +10,28 @@ export default function App() {
       if (isCurrent) setUser(user);
     });
 
+    netlifyIdentity.on("logout", (user) => setUser(null));
+
     return () => {
       isCurrent = false;
       netlifyIdentity.off("login");
+      netlifyIdentity.off("logout");
     };
   }, []);
 
-  return user ? (
+  if (!user)
+    return (
+      <div>
+        <button
+          className="uk-button uk-button-primary"
+          onClick={() => netlifyIdentity.open()}
+        >
+          Log in
+        </button>
+      </div>
+    );
+
+  return (
     <div>
       You are logged in!
       <div>Welcome {user?.user_metadata?.full_name ?? "NoName"}!</div>
@@ -28,12 +43,5 @@ export default function App() {
         Log out
       </button>
     </div>
-  ) : (
-    <button
-      className="uk-button uk-button-primary"
-      onClick={() => netlifyIdentity.open()}
-    >
-      Log in
-    </button>
   );
 }

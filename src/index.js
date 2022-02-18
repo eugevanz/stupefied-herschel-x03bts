@@ -9,7 +9,7 @@ import netlifyIdentity from "netlify-identity-widget";
 // You must run this once before trying to interact with the widget
 netlifyIdentity.init({
   APIUrl: 'https://loving-brattain-c7b41f.netlify.app/.netlify/identity',
-  namePlaceholder: 'some-placeholder-for-Name',
+  namePlaceholder: 'Your full name',
   locale: 'en'
 });
 
