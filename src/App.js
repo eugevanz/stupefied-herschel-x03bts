@@ -17,13 +17,13 @@ function AuthStatusView() {
         { isLoggedIn ? `Hello ${ name }, Log out here!` : 'Log In' }
       </button>
     </div>
-    <IdentityModal
-      showDialog={ dialog }
-      onCloseDialog={ () => setDialog(false) }
-      onLogin={ (user) => console.log('hello ', user.user_metadata) }
-      onSignup={ (user) => console.log('welcome ', user.user_metadata) }
-      onLogout={ () => console.log('bye ', name) }
-    />
+    <IdentityModal aria-label='login-modal' showDialog={ dialog } onCloseDialog={ () => setDialog(false) } onLogin={ (user) => 
+      console.log('hello ',user.user_metadata) 
+    } onSignup={ (user) => 
+      console.log('welcome ', user.user_metadata) 
+    } onLogout={ () => 
+      console.log('bye ', name) 
+    }></IdentityModal>
   </div>);
 }
 
