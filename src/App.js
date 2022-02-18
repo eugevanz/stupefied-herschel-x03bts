@@ -1,36 +1,51 @@
-import { useState } from 'react';
-import IdentityModal, {
-  useIdentityContext,
-  IdentityContextProvider
-} from 'react-netlify-identity-widget';
+import { useState, useEffect } from 'react';
+import netlifyIdentity from 'netlify-identity-widget';
 
-function AuthStatusView() {
-  const identity = useIdentityContext();
-  const [dialog, setDialog] = useState(false);
-  const name = (identity && identity.user && identity.user.user_metadata && identity.user.user_metadata.name) || 'NoName';
-
-  const isLoggedIn = identity && identity.isLoggedIn;
-
-  return (<div>
-    <div>
-      <button className="RNIW_btn" onClick={ () => setDialog(true) }>
-        { isLoggedIn ? `Hello ${ name }, Log out here!` : 'Log In' }
-      </button>
-    </div>
-    <IdentityModal aria-label='login-modal' showDialog={ dialog } onCloseDialog={ () => setDialog(false) } onLogin={ (user) => 
-      console.log('hello ',user.user_metadata) 
-    } onSignup={ (user) => 
-      console.log('welcome ', user.user_metadata) 
-    } onLogout={ () => 
-      console.log('bye ', name) 
-    }></IdentityModal>
-  </div>);
+const netlifyAuth = {
+  isAuthenticated: false,
+  user: null,
+  initialize(callback) {
+    // window.netlifyIdentity = netlifyIdentity
+    netlifyIdentity.on('init', (user) => {
+      callback(user)
+    })
+    netlifyIdentity.init()
+  },
+  authenticate(callback) {
+    this.isAuthenticated = true
+    netlifyIdentity.open()
+    netlifyIdentity.on('login', (user) => {
+      this.user = user
+      callback(user)
+      netlifyIdentity.close()
+    })
+  },
+  signout(callback) {
+    this.isAuthenticated = false
+    netlifyIdentity.logout()
+    netlifyIdentity.on('logout', () => {
+      this.user = null
+      callback()
+    })
+  },
 }
 
 export default function App() {
-  const url = "https://loving-brattain-c7b41f.netlify.app";
+  const [loggedIn, setLoggedIn] = useState(netlifyAuth.isAuthenticated);
 
-  return (<IdentityContextProvider url={ url }>
-    <AuthStatusView></AuthStatusView>
-  </IdentityContextProvider>);
+  useEffect(() => {
+    netlifyAuth.initialize((user) => {
+      setLoggedIn(!!user)
+    })
+  }, [loggedIn]);
+
+  return (loggedIn ? (
+    <div>
+      You are logged in!
+    </div>
+  ) : (
+    <button>
+      Log in here.
+    </button>
+  ));
 }
