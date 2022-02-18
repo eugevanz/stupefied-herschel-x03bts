@@ -1,12 +1,16 @@
-import { StrictMode } from "react";
 import ReactDOM from "react-dom";
 
 import App from "./App";
 
-const rootElement = document.getElementById("root");
-ReactDOM.render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-  rootElement
-);
+// import registerServiceWorker from './registerServiceWorker';
+import netlifyIdentity from "netlify-identity-widget";
+
+// window.netlifyIdentity = netlifyIdentity;
+// You must run this once before trying to interact with the widget
+netlifyIdentity.init({
+  APIUrl: 'https://loving-brattain-c7b41f.netlify.app/.netlify/identity',
+  namePlaceholder: 'some-placeholder-for-Name',
+  locale: 'en'
+});
+
+ReactDOM.render(<App />, document.getElementById('root'));

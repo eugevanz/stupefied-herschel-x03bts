@@ -1,51 +1,39 @@
-import { useState, useEffect } from 'react';
-import netlifyIdentity from 'netlify-identity-widget';
-
-const netlifyAuth = {
-  isAuthenticated: false,
-  user: null,
-  initialize(callback) {
-    // window.netlifyIdentity = netlifyIdentity
-    netlifyIdentity.on('init', (user) => {
-      callback(user)
-    })
-    netlifyIdentity.init()
-  },
-  authenticate(callback) {
-    this.isAuthenticated = true
-    netlifyIdentity.open()
-    netlifyIdentity.on('login', (user) => {
-      this.user = user
-      callback(user)
-      netlifyIdentity.close()
-    })
-  },
-  signout(callback) {
-    this.isAuthenticated = false
-    netlifyIdentity.logout()
-    netlifyIdentity.on('logout', () => {
-      this.user = null
-      callback()
-    })
-  },
-}
+import { useState, useEffect } from "react";
+import netlifyIdentity from "netlify-identity-widget";
 
 export default function App() {
-  const [loggedIn, setLoggedIn] = useState(netlifyAuth.isAuthenticated);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    netlifyAuth.initialize((user) => {
-      setLoggedIn(!!user)
-    })
-  }, [loggedIn]);
+    let isCurrent = true;
+    netlifyIdentity.on("login", (user) => {
+      if (isCurrent) setUser(user);
+    });
 
-  return (loggedIn ? (
+    return () => {
+      isCurrent = false;
+      netlifyIdentity.off("login");
+    };
+  }, []);
+
+  return user ? (
     <div>
       You are logged in!
+      <div>Welcome {user?.user_metadata?.full_name ?? "NoName"}!</div>
+      <br />
+      <button
+        className="uk-button uk-button-danger"
+        onClick={() => netlifyIdentity.logout()}
+      >
+        Log out
+      </button>
     </div>
   ) : (
-    <button>
-      Log in here.
+    <button
+      className="uk-button uk-button-primary"
+      onClick={() => netlifyIdentity.open()}
+    >
+      Log in
     </button>
-  ));
+  );
 }
